@@ -1,0 +1,16 @@
+{
+  "name": "227",
+  "version": "0.1.0",
+  "description": "College social network.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://www.github.com/emanguy/227.git"
+  },
+  "author": "The 2-27 team",
+  "license": "ISC"
+}
