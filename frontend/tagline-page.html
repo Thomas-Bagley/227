@@ -1,0 +1,116 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="bower_components/neon-animation/neon-animation-behavior.html">
+<link rel="import" href="bower_components/neon-animation/animations/slide-up-animation.html">
+<link rel="import" href="bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="bower_components/iron-icons/iron-icons.html">
+
+<dom-module id="tagline-page">
+	<template>
+		<style>
+			:host
+			{
+				/* Apply layout mixins to help with page layout */
+				@apply(--layout-vertical);
+				@apply(--layout-center);
+				@apply(--layout-around-justified);
+				@apply(--layout-fit);
+
+				background: var(--paper-blue-500);
+
+				padding-left: 8px;
+				padding-right: 8px;
+			}	
+
+			/* For mobile devices */
+			.tagline-large
+			{
+				@apply(--paper-font-headline);
+				color: white;
+				text-align: center;
+			}
+
+			img
+			{
+				width: 200px;
+				height: 200px;
+			}
+
+			/* Desktop and tablet */
+			@media screen and (min-width: 426px)
+			{
+				.tagline-large
+				{
+					@apply(--paper-font-display2);
+					opacity: 0.54;
+					color: white;
+					text-align: center;
+				}
+			}
+
+			/* On desktop, central image is larger */
+			@media screen and (min-width: 769px)
+			{
+				img
+				{
+					width: 500px;
+					height: 500px;
+				}
+			}
+
+			.caption-below
+			{
+				@apply(--paper-font-headline);
+				color: white;
+			}
+
+			paper-icon-button
+			{
+				color: white;
+			}
+		</style>
+
+		<span class="tagline-large">Put your most valuable resource to work.</span>
+		<img src="http://placehold.it/500x500">
+		<span class="caption-below">Your Classmates.</span>
+		<paper-icon-button id="next" icon="expand-more"></paper-icon-button>
+
+
+	</template>
+
+	<script>
+		Polymer({
+			is: "tagline-page",
+			behaviors: [ Polymer.NeonAnimatableBehavior ], // Allow this element to be animated by neon-animated-pages
+			
+			properties:
+			{
+				animationConfig: function() 
+				{
+					return {
+						// Define an animation called "exit" to be called when exiting this site state
+						'exit': {
+							name: "slide-up-animation",
+							node: this
+						}
+					}
+				},
+
+				exitAnimation: 'exit'
+			},
+
+			listeners:
+			{
+				"next.tap": "nextPage" // This adds a listener to "next" which calls "nextPage" after it is tapped
+			},
+
+			nextPage: function(e)
+			{
+				console.log("Next page");
+				this.fire('nav', { where: "description-page" });
+			}
+		});
+	</script>
+</dom-module>
