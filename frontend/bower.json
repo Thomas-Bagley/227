@@ -26,6 +26,10 @@
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.1",
     "iron-media-query": "PolymerElements/iron-media-query#^1.0.8",
     "paper-icon-button": "^1.0.7",
-    "page": "visionmedia/page.js#^1.7.1"
+    "page": "visionmedia/page.js#^1.7.1",
+    "paper-card": "PolymerElements/paper-card#^1.1.1",
+    "google-youtube": "GoogleWebComponents/google-youtube#^1.2.1",
+    "paper-dialog": "PolymerElements/paper-dialog#^1.0.4",
+    "paper-button": "PolymerElements/paper-button#^1.0.11"
   }
 }

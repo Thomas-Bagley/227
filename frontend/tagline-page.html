@@ -1,9 +1,10 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
 <link rel="import" href="bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="bower_components/neon-animation/neon-animation-behavior.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="bower_components/neon-animation/neon-animatable-behavior.html">
+<link rel="import" href="bower_components/neon-animation/animations/fade-in-animation.html">
 <link rel="import" href="bower_components/neon-animation/animations/slide-up-animation.html">
-<link rel="import" href="bower_components/iron-media-query/iron-media-query.html">
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 
@@ -13,10 +14,10 @@
 			:host
 			{
 				/* Apply layout mixins to help with page layout */
+				@apply(--layout-fit);
 				@apply(--layout-vertical);
 				@apply(--layout-center);
 				@apply(--layout-around-justified);
-				@apply(--layout-fit);
 
 				background: var(--paper-blue-500);
 
@@ -87,13 +88,21 @@
 			
 			properties:
 			{
-				animationConfig: function() 
+				animationConfig:  
 				{
-					return {
-						// Define the animation played when exiting this page
-						'exit': {
-							name: "slide-up-animation",
-							node: this
+					value: function()
+					{
+						return {
+							// This may not be used but is probably necessary
+							'entry': {
+								name: 'fade-in-animation',
+								node: this
+							},
+							// Define the animation played when exiting this page
+							'exit': {
+								name: 'slide-up-animation',
+								node: this
+							}
 						}
 					}
 				}
@@ -108,6 +117,7 @@
 			{
 				console.log("Next page");
 				this.fire('nav', { where: "description-page" });
+				this.fire('background', { color: this.getComputedStyleValue("--paper-blue-300") });
 			}
 		});
 	</script>
