@@ -4,10 +4,14 @@
 <link rel="import" href="bower_components/neon-animation/neon-animatable-behavior.html">
 <link rel="import" href="bower_components/neon-animation/animations/cascaded-animation.html">
 <link rel="import" href="bower_components/neon-animation/animations/slide-from-bottom-animation.html">
+<link rel="import" href="bower_components/neon-animation/animations/fade-in-animation.html">
+<link rel="import" href="bower_components/neon-animation/animations/scale-down-animation.html">
 <link rel="import" href="bower_components/paper-card/paper-card.html">
 <link rel="import" href="bower_components/google-youtube/google-youtube.html">
 <link rel="import" href="bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
 
 <dom-module id="description-page">
 	<template>
@@ -16,9 +20,9 @@
 			{
 				
 				@apply(--layout-vertical);
+				--paper-input-container-focus-color: var(--dark-accent-color);
 
 				background: var(--paper-blue-300);
-
 				padding: 8px;
 			}
 
@@ -45,17 +49,22 @@
 				margin-top: 8px;
 			}
 
+			/* Styling for the vertical container containing the login stuff */
+			.vert-container
+			{
+				@apply(--layout-vertical);
+			}
+
 			/* Class for centering content in a container */
 			.centralize
 			{
-				@apply(--layout-center-justified)
+				@apply(--layout-center-justified);
 			}
 
 			/* Sizing and spacing for cards */
 			paper-card
 			{
 				width: 300px;
-				height: 250px;
 
 				margin: 4px;
 			}
@@ -64,7 +73,7 @@
 			paper-fab
 			{
 				position: fixed;
-				right: 16px;
+				right: 20px;
 				bottom: 16px;
 
 				color: black;
@@ -76,6 +85,12 @@
 				color: var(--dark-accent-color);
 				-webkit-tap-highlight-color: rgba(0,0,0,0);
 			}
+
+			google-youtube
+			{
+				width: 268px;
+				height: 175px;
+			}
 		</style>
 
 		<!-- Initial welcome text -->
@@ -83,10 +98,10 @@
 		<span class="secondary-text">Our mission: to connect you to classmates and help you succeed in the classroom.</span>
 		
 		<!-- Container containing all informational cards -->
-		<div class="horiz-container centralize">
+		<div id="container" class="horiz-container centralize">
 			<paper-card heading="Who we are">
 				<div class="card-content">
-					<google-youtube video-id="1qN72LEQnaU" width="300px" height="150px"></google-youtube>
+					<google-youtube video-id="1qN72LEQnaU"></google-youtube>
 				</div>
 			</paper-card>
 
@@ -124,7 +139,7 @@
 				<div class="card-content">
 					<p>There's so much more to discover when you join CourseNet. Join today!</p>
 
-					<!-- Had to add space to force the buttons to the bottom. -->
+					<!-- Had to add some space so the join button wasn't being dumb -->
 					<br><br>
 				</div>
 
@@ -136,43 +151,77 @@
 
 		<!-- Floating action button for login -->
 		<paper-fab id="loginfab" icon="lock"></paper-fab>
+
+		<!-- Login dialog -->
+		<paper-dialog id="logindialog" entry-animation="slide-from-bottom-animation" exit-animation="scale-down-animation">
+			<h1>Login</h1>
+			<div>
+				<paper-input label="Username"></paper-input>
+				<paper-input label="Password" type="password">
+			</div>
+			<div class="buttons">
+				<paper-button dialog-dismiss>Create account</paper-button>
+				<paper-button dialog-dismiss>Cancel</paper-button>
+				<paper-button dialog-confirm>Log in</paper-button>
+			<div>
+		</paper-dialog>
 	</template>
 
 	<script>
-Polymer({
-	is: "description-page",
-	behaviors: [ Polymer.NeonAnimatableBehavior ],
+		Polymer({
+			is: "description-page",
+			behaviors: [ Polymer.NeonAnimatableBehavior ],
 
-	listeners: 
-	{
-		"joinbutton.tap": "_showJoinDialog",
-		"loginfab.tap": "_showLoginDialog"
-	},
-
-	properties:
-	{
-		animationConfig: {
-			value: function(e)
+			// Add some event listeners to open the login/join dialogs
+			listeners: 
 			{
-				return {
-					'entry': {
-						name: "slide-from-bottom-animation",
-						node: this
+				"joinbutton.tap": "_showJoinDialog",
+				"loginfab.tap": "_showLoginDialog"
+			},
+
+			properties:
+			{
+				animationConfig: {
+					value: function(e)
+					{
+						return {
+							'entry': [
+								// Slide the entire container from the bottom
+								{
+									name: "slide-from-bottom-animation",
+									node: this
+								},
+								// Slide the cards up after the prev. animation completes
+								{
+									name: "cascaded-animation",
+									animation: "slide-from-bottom-animation",
+									nodes: Polymer.dom(this.$.container).children,
+									timing: { delay: 300 }
+								},
+								// Fade in the cards when they fly up
+								{
+									name: "cascaded-animation",
+									animation: "fade-in-animation",
+									nodes: Polymer.dom(this.$.container).children,
+									timing: { delay: 300 }
+								}
+							]
+						}
 					}
-				}
+				} 	
+			},
+
+			// Self-explanatory
+			_showLoginDialog: function(event, detail, sender)
+			{
+				this.$.logindialog.open();
+			},
+
+			// Self-explanatory
+			_showJoinDialog: function(event, detail, sender)
+			{
+				alert("We show the join dialog here.");
 			}
-		} 	
-	},
-
-	_showLoginDialog: function(event, detail, sender)
-	{
-		alert("We show the login dialog here.");
-	},
-
-	_showJoinDialog: function(event, detail, sender)
-	{
-		alert("We show the join dialog here.");
-	}
-});
+		});
 	</script>
 </dom-module>
