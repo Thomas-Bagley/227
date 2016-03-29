@@ -12,7 +12,8 @@
 		<link rel="import" href="bower_components/neon-animation/neon-animated-pages.html">
 		<link rel="import" href="bower_components/paper-styles/paper-styles-classes.html">
 		<link rel="import" href="bower_components/paper-styles/color.html">
-		<link rel="import" href="bower_components/paper-fab/paper-fab.html">
+		<link rel="import" href="bower_components/paper-toast/paper-toast.html">
+		<link rel="import" href="bower_components/iron-media-query/iron-media-query.html">
 
 		<link rel="import" href="tagline-page.html">
 		<link rel="import" href="description-page.html">
@@ -51,12 +52,15 @@
 
 			<template is="dom-bind" id="animPages">
 
+				<iron-media-query id="screensize" query="(max-width: 426px)" queryMatches="{{notMobile}}"></iron-media-query>
+
 				<!-- Switcher between different pages of the webiste -->
 				<neon-animated-pages class="fit" attr-for-selected="route" selected="[[selected]]">
 					<tagline-page route="tagline-page"></tagline-page>
 					<description-page route="description-page"></description-page>
 				</neon-animated-pages>
 
+				<paper-toast id="toast" text="{{toastText}}"></paper-toast>
 			</template>
 		</paper-header-panel>
 
@@ -66,37 +70,72 @@
 		// Add an event listener to see when the auto-binding template is ready
 		(function()
 		 {
-			 document.addEventListener("dom-change", function()
+			 document.addEventListener("dom-change", function(event)
 				{
 					var template = document.querySelector("#animPages");
 					var body = document.querySelector("#body");
 
-					// Elements can fire the "nav" event if they want to navigate somewhere without an <a> tag
-					document.addEventListener("nav", function(event)
+					template.toastText = "Put some text in here, dummy!";
+
+					// Ensure the dom-change event is coming from the dom-bind template
+					if (event.target === template)
+					{
+						// Elements can fire the "nav" event if they want to navigate somewhere without an <a> tag
+						document.addEventListener("nav", function(event)
+								{
+									if (event.detail.where)
+									{
+										console.log("Received event. Navigate to: " + event.detail.where);
+										template.selected = event.detail.where;
+									}
+									else if (event.detail.url)
+									{
+										console.log("Received redirect event. Navigate to: " + event.detail.url);
+										page.redirect(event.detail.url);
+									}
+								});
+
+						// Elements can fire the "background" event to set the full page background color
+						document.addEventListener("background", function(event)
 							{
-								console.log("Received event. Navigate to: " + event.detail.where);
-								template.selected = event.detail.where;
+								console.log("Changing bg color to ", event.detail.color);
+								body.style.backgroundColor = event.detail.color;
 							});
 
-					// Elements can fire the "background" event to set the full page background color
-					document.addEventListener("background", function(evnet)
+						// Elements can fire the "notify" event to show a notification through the global toast
+						document.addEventListener("notify", function(event)
+								{
+									console.log("Notifying with text " + event.detail.message);
+									template.toastText = event.detail.message;
+									template.$.toast.open();
+								});
+
+						// Add event listener to toggle class on paper toast when screen gets small enough
+						template.$.screensize.addEventListener("query-matches-changed", function()
+								{
+									console.log("toggled");
+									Polymer.Base.toggleClass("fit-bottom", template.$.screensize.queryMatches, template.$.toast);
+								});
+
+						// Initially set the class on the paper toast
+						Polymer.Base.toggleClass("fit-bottom", template.$.screensize.queryMatches, template.$.toast);
+
+						// Define website pages
+						page("/", mainPage);
+						page("/about", descriptorPage);
+						page({hashbang: true});
+
+						function mainPage(ctx)
 						{
-							console.log("Changing bg color to ", event.detail.color);
-							body.style.backgroundColor = event.detail.color;
-						});
+							template.selected = "tagline-page";
+						}
 
-					// Define website pages
-					page("/", mainPage);
-					page({hashbang: true});
-
-					// Navigate to main page
-					page("/");
-
-					function mainPage(ctx)
-					{
-						template.selected = "tagline-page";
+						function descriptorPage(ctx)
+						{
+							template.selected = "description-page";
+						}
 					}
-				})
+				});
 		 })();
 	</script>
 </html>

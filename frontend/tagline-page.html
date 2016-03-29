@@ -115,9 +115,8 @@
 
 			nextPage: function(e)
 			{
-				console.log("Next page");
 				this.fire('nav', { where: "description-page" });
-				this.fire('background', { color: this.getComputedStyleValue("--paper-blue-300") });
+				this.fire('background', { color: this.getComputedStyleValue("--paper-blue-300"), color2: "hello" });
 			}
 		});
 	</script>
