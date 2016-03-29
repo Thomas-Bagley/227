@@ -52,7 +52,8 @@
 
 			<template is="dom-bind" id="animPages">
 
-				<iron-media-query id="screensize" query="(max-width: 426px)" queryMatches="{{notMobile}}"></iron-media-query>
+				<!-- Tests whether or not this is being viewed on a mobile device -->
+				<iron-media-query id="screensize" query="(max-width: 426px)"></iron-media-query>
 
 				<!-- Switcher between different pages of the webiste -->
 				<neon-animated-pages class="fit" attr-for-selected="route" selected="[[selected]]">
@@ -113,7 +114,6 @@
 						// Add event listener to toggle class on paper toast when screen gets small enough
 						template.$.screensize.addEventListener("query-matches-changed", function()
 								{
-									console.log("toggled");
 									Polymer.Base.toggleClass("fit-bottom", template.$.screensize.queryMatches, template.$.toast);
 								});
 
