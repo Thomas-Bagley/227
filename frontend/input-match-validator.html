@@ -1,0 +1,28 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/iron-validator-behavior/iron-validator-behavior.html">
+
+<!-- 
+	This "element" is used to test whether or not the input of multiple
+	text fields are equal.
+-->
+<script>
+Polymer({
+	is: "input-match-validator",
+	behaviors: [ Polymer.IronValidatorBehavior ],
+
+	validate: function(arr)
+	{
+		var valid = true;
+
+		if (arr instanceof Array)
+		{
+			for (var index = 0; index < arr.length - 1; index++)
+			{
+				valid = valid && (arr[index] === arr[index + 1]);
+			}
+		}
+
+		return valid;
+	}
+})
+</script>
