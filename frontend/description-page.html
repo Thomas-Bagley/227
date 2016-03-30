@@ -15,6 +15,7 @@
 <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="bower_components/paper-input/paper-input.html">
 <link rel="import" href="bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="input-match-validator.html">
 
 <dom-module id="description-page">
@@ -160,6 +161,7 @@
 
 		<!-- Floating action button for login -->
 		<paper-fab id="loginfab" icon="lock"></paper-fab>
+		<paper-tooltip for="loginfab" position="left">Log in to CourseNet</paper-tooltip>
 
 		<!-- Signup dialog -->
 		<paper-dialog id="signupdialog">
