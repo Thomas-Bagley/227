@@ -1,0 +1,360 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="bower_components/neon-animation/neon-animatable-behavior.html">
+<link rel="import" href="bower_components/neon-animation/animations/slide-up-animation.html">
+<link rel="import" href="bower_components/neon-animation/animations/cascaded-animation.html">
+<link rel="import" href="bower_components/neon-animation/animations/slide-from-bottom-animation.html">
+<link rel="import" href="bower_components/neon-animation/animations/fade-in-animation.html">
+<link rel="import" href="bower_components/neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="bower_components/neon-animation/animations/scale-down-animation.html">
+<link rel="import" href="bower_components/paper-card/paper-card.html">
+<link rel="import" href="bower_components/google-youtube/google-youtube.html">
+<link rel="import" href="bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
+<link rel="import" href="bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="input-match-validator.html">
+
+<dom-module id="description-page">
+	<template>
+		<style>
+			:host
+			{
+				@apply(--layout-vertical);
+				--paper-input-container-focus-color: var(--dark-accent-color);
+
+				background: var(--paper-blue-300);
+				padding: 8px;
+			}
+
+			/* Style welcome text */
+			.title-text
+			{
+				@apply(--paper-font-display2);
+				color: white;
+			}
+
+			/* Style catchphrase */
+			.secondary-text
+			{
+				@apply(--paper-font-headline);
+				color: black;
+			}
+
+			/* Styling for the horizontal container containing cards */
+			.horiz-container
+			{
+				@apply(--layout-horizontal);
+				@apply(--layout-wrap);
+
+				margin-top: 8px;
+			}
+
+			/* Styling for the vertical container containing the login stuff */
+			.vert-container
+			{
+				@apply(--layout-vertical);
+			}
+
+			/* Class for centering content in a container */
+			.centralize
+			{
+				@apply(--layout-center-justified);
+			}
+
+			/* Class for error coloring */
+			.error
+			{
+				color: var(--error-color);
+			}
+
+			/* Sizing and spacing for cards */
+			paper-card
+			{
+				width: 300px;
+
+				margin: 4px;
+			}
+
+			/* Get that floating paper fab for login */
+			paper-fab
+			{
+				position: fixed;
+				right: 20px;
+				bottom: 16px;
+
+				color: black;
+			}
+
+			/* Color the paper-button */
+			paper-button
+			{
+				color: var(--dark-accent-color);
+				-webkit-tap-highlight-color: rgba(0,0,0,0);
+			}
+
+			google-youtube
+			{
+				width: 268px;
+				height: 175px;
+			}
+		</style>
+
+		<!-- Initial welcome text -->
+		<span class="title-text">Welcome!</span><br>
+		<span class="secondary-text">Our mission: to connect you to classmates and help you succeed in the classroom.</span>
+		
+		<!-- Container containing all informational cards -->
+		<div id="container" class="horiz-container centralize">
+			<paper-card heading="Who we are">
+				<div class="card-content">
+					<google-youtube video-id="1qN72LEQnaU"></google-youtube>
+				</div>
+			</paper-card>
+
+			<paper-card heading="Connect" image="http://placehold.it/100x50">
+				<div class="card-content">
+					<p>Join class groups to connect to classmates.</p>
+				</div>
+			</paper-card>
+
+			<paper-card heading="Test Together" image="http://placehold.it/100x50">
+				<div class="card-content">
+					<p>Create and share tests.</p>
+				</div>
+			</paper-card>
+
+			<paper-card heading="Get Supplied" image="http://placehold.it/100x50">
+				<div class="card-content">
+					<p>Buy and sell textbooks.</p>
+				</div>
+			</paper-card>
+
+			<paper-card heading="Study Together" image="http://placehold.it/100x50">
+				<div class="card-content">
+					<p>Make and share notecards.</p>
+				</div>
+			</paper-card>
+
+			<paper-card heading="Invite classmates" image="http://placehold.it/100x50">
+				<div class="card-content">
+					<p>Invite your classmates to groups via e-mail.</p>
+				</div>
+			</paper-card>
+
+			<paper-card heading="..And More!">
+				<div class="card-content">
+					<p>There's so much more to discover when you join CourseNet. Join today!</p>
+
+					<!-- Had to add some space so the join button wasn't being dumb -->
+					<br><br>
+				</div>
+
+				<div class="card-actions">
+					<paper-button id="joinbutton">Join CourseNet</paper-button>
+				</div>
+			</paper-card>
+		</div>
+
+		<!-- Floating action button for login -->
+		<paper-fab id="loginfab" icon="lock"></paper-fab>
+		<paper-tooltip for="loginfab" position="left">Log in to CourseNet</paper-tooltip>
+
+		<!-- Signup dialog -->
+		<paper-dialog id="signupdialog">
+			<h1>CourseNet Sign-Up</h1>
+			<div>
+				<paper-input id="emailsignup" label="School e-mail" auto-validate pattern="[a-zA-Z0-9]+@[a-z]+.edu" error-message="Enter a valid e-mail"></paper-input>
+				<paper-input on-input="_testPasswordMatch" id="password1" label="Choose a password" invalid="[[!passwordsMatch]]" type="password"></paper-input>
+				<paper-input on-input="_testPasswordMatch" id="password2" label="Re-enter password" invalid="[[!passwordsMatch]]"type="password"></paper-input>
+				
+				<br>
+				<span hidden$="[[passwordsMatch]]" class="error">
+					<iron-icon icon="warning"></iron-icon>
+					<span>Passwords must match.</span>
+				</span>
+			</div>
+			<div class="buttons">
+				<paper-button on-tap="_setAnim"dialog-dismiss>Cancel</paper-button>
+				<paper-button on-tap="_join">Join</paper-button>
+			</div>
+		</paper-dialog>
+
+		<!-- Login dialog -->
+		<paper-dialog id="logindialog" entry-animation="slide-from-bottom-animation" exit-animation="scale-down-animation">
+			<h1>Login</h1>
+			<div>
+				<paper-input id="emailinput" label="School e-mail" pattern="[a-zA-Z0-9]+@[a-z]+.edu" error-message="Enter a valid e-mail."></paper-input>
+				<paper-input id="passwordinput" label="Password" type="password" error-message="Please enter your password.">
+			</div>
+			<div class="buttons">
+				<paper-button on-tap="_showJoinDialog" dialog-dismiss>Create account</paper-button>
+				<paper-button dialog-dismiss>Cancel</paper-button>
+				<paper-button on-tap="_attemptLogin">Log in</paper-button>
+			<div>
+		</paper-dialog>
+	</template>
+
+	<script>
+		Polymer({
+			is: "description-page",
+			behaviors: [ Polymer.NeonAnimatableBehavior ],
+
+			// Add some event listeners to open the login/join dialogs
+			listeners: 
+			{
+				"joinbutton.tap": "_showJoinDialog",
+				"loginfab.tap": "showLoginDialog"
+			},
+
+			properties:
+			{
+				animationConfig: {
+					value: function()
+					{
+						return {
+							'entry': [
+								// Slide the entire container from the bottom
+								{
+									name: "slide-from-bottom-animation",
+									node: this
+								},
+								// Slide the cards up after the prev. animation completes
+								{
+									name: "cascaded-animation",
+									animation: "slide-from-bottom-animation",
+									nodes: Polymer.dom(this.$.container).children,
+									timing: { delay: 300 }
+								},
+								// Fade in the cards when they fly up
+								{
+									name: "cascaded-animation",
+									animation: "fade-in-animation",
+									nodes: Polymer.dom(this.$.container).children,
+									timing: { delay: 300 }
+								}
+							]
+						}
+					}
+				},
+
+				inputValidator: {
+					type: Object,
+					value: document.createElement("input-match-validator"),
+					readOnly: true
+				},
+				
+				passwordsMatch: {
+					type: Boolean,
+					value: true,
+					readOnly: true
+				}
+			},
+
+			ready: function()
+			{
+				this.$.signupdialog.animationConfig = {
+							'entry': {
+								name: "slide-from-bottom-animation",
+								node: this.$.signupdialog
+							},
+
+							'exit': [
+								{
+									name: "slide-up-animation",
+									node: this.$.signupdialog
+								},
+								{
+									name: "fade-out-animation",
+									node: this.$.signupdialog
+								}
+							]
+				};
+			},
+
+			// Self-explanatory
+			showLoginDialog: function(event, detail, sender)
+			{
+				this.$.logindialog.open();
+			},
+
+			// Self-explanatory
+			_showJoinDialog: function(event, detail, sender)
+			{
+				this.$.signupdialog.open();
+			},
+
+			// Validate login fields then attempt to login to CourseNet
+			_attemptLogin: function(event, detail, sender)
+			{
+				this.$.emailinput.errorMessage = "Please enter a valid e-mail.";
+				this.$.passwordinput.invalid = false;
+
+				if (this.$.emailinput.validate() && this.$.emailinput.value !== "" && this.$.passwordinput.value !== "")
+				{
+					this.$.logindialog.close();
+				}
+				else
+				{
+					if (this.$.emailinput.value === "")
+					{
+						this.$.emailinput.errorMessage = "You must enter your e-mail.";
+						this.$.emailinput.invalid = true;
+					}
+
+					if (this.$.passwordinput.value === "")
+					{
+						this.$.passwordinput.invalid = true;
+					}
+				}
+			},
+
+			// Test to see if signup passwords match
+			_testPasswordMatch: function()
+			{
+				this._setPasswordsMatch(this.inputValidator.validate([this.$.password1.value, this.$.password2.value]));
+			},
+
+			// Set join dialog's animation to a scale-down-animation
+			_setAnim: function()
+			{
+				this.$.signupdialog.animationConfig["exit"] = 
+				{
+					name: "scale-down-animation",
+					node: this.$.signupdialog
+				}
+			},
+
+			// Attempt to show a notification
+			_join: function()
+			{
+				if (this.passwordsMatch && this.$.emailsignup.value !== "" &&
+				  		this.$.password1.value !== "" && this.$.password2.value !== "" &&
+						!this.$.emailsignup.invalid)
+				{
+					// Fire a notify event to show the global toast
+					this.fire("notify", {message: "Your request to join CourseNet is now being evaluated. Please check your e-mail!"});
+
+					// Make the signup dialog "fly up" as if being sent
+					this.$.signupdialog.animationConfig["exit"] =
+						[
+							{
+								name: "slide-up-animation",
+								node: this.$.signupdialog
+							},
+							{
+								name: "fade-out-animation",
+								node: this.$.signupdialog
+							}
+						];
+
+					// Close the signup dialog
+					this.$.signupdialog.close();
+				}
+			}
+		});
+	</script>
+</dom-module>

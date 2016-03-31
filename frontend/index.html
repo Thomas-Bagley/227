@@ -1,10 +1,141 @@
 <html>
 	<head>
+		<!-- Import web component compatibility library -->
+		<script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+		<!-- Client-based routing library -->
+		<script src="bower_components/page/page.js"></script>
+
+		<!-- Import dependencies -->
+		<link rel="import" href="bower_components/polymer/polymer.html">
+		<link rel="import" href="bower_components/paper-header-panel/paper-header-panel.html">
+		<link rel="import" href="bower_components/paper-toolbar/paper-toolbar.html">
+		<link rel="import" href="bower_components/neon-animation/neon-animated-pages.html">
+		<link rel="import" href="bower_components/paper-styles/paper-styles-classes.html">
+		<link rel="import" href="bower_components/paper-styles/color.html">
+		<link rel="import" href="bower_components/paper-toast/paper-toast.html">
+		<link rel="import" href="bower_components/iron-media-query/iron-media-query.html">
+
+		<link rel="import" href="tagline-page.html">
+		<link rel="import" href="description-page.html">
+
+		<!-- Add meta rules for mobile and tab coloring -->
+		<meta name="theme-color" content="#2196F3">
+		<meta name="viewport" content="width=device-width">
+		<meta name="description" content="The social network where college students collaborate.">
+
 		<title>A test.</title>
+
+		<!-- CSS custom style -->
+		<style is="custom-style">
+			:root
+			{
+				--primary-color: var(--paper-blue-500);
+				--light-primary-color: var(--paper-blue-100);
+				--dark-primary-color: var(--paper-blue-800);
+
+				--accent-color: var(--paper-yellow-500);
+				--light-accent-color: var(--paper-yellow-100);
+				--dark-accent-color: var(--paper-yellow-800);
+			}
+		</style>
 	</head>
 
-	<body>
-		<h1>Added a title.</h1>
-		<p>Hello world!</p>
+	<body id="body" unresolved class="fullbleed vertical layout">
+
+		<!-- Layout element -->
+		<paper-header-panel mode="seamed" style="margin:none">
+
+			<!-- Top toolbar -->
+			<paper-toolbar>
+				<p class="paper-font-display1">CourseNet</p>
+			</paper-toolbar>
+
+			<template is="dom-bind" id="animPages">
+
+				<!-- Tests whether or not this is being viewed on a mobile device -->
+				<iron-media-query id="screensize" query="(max-width: 426px)"></iron-media-query>
+
+				<!-- Switcher between different pages of the webiste -->
+				<neon-animated-pages class="fit" attr-for-selected="route" selected="[[selected]]">
+					<tagline-page route="tagline-page"></tagline-page>
+					<description-page route="description-page"></description-page>
+				</neon-animated-pages>
+
+				<paper-toast duration="5000" id="toast" text="{{toastText}}"></paper-toast>
+			</template>
+		</paper-header-panel>
+
 	</body>
+
+	<script>
+		// Add an event listener to see when the auto-binding template is ready
+		(function()
+		 {
+			 document.addEventListener("dom-change", function(event)
+				{
+					var template = document.querySelector("#animPages");
+					var body = document.querySelector("#body");
+
+					template.toastText = "Put some text in here, dummy!";
+
+					// Ensure the dom-change event is coming from the dom-bind template
+					if (event.target === template)
+					{
+						// Elements can fire the "nav" event if they want to navigate somewhere without an <a> tag
+						document.addEventListener("nav", function(event)
+								{
+									if (event.detail.where)
+									{
+										console.log("Received event. Navigate to: " + event.detail.where);
+										template.selected = event.detail.where;
+									}
+									else if (event.detail.url)
+									{
+										console.log("Received redirect event. Navigate to: " + event.detail.url);
+										page.redirect(event.detail.url);
+									}
+								});
+
+						// Elements can fire the "background" event to set the full page background color
+						document.addEventListener("background", function(event)
+							{
+								console.log("Changing bg color to ", event.detail.color);
+								body.style.backgroundColor = event.detail.color;
+							});
+
+						// Elements can fire the "notify" event to show a notification through the global toast
+						document.addEventListener("notify", function(event)
+								{
+									console.log("Notifying with text " + event.detail.message);
+									template.toastText = event.detail.message;
+									template.$.toast.open();
+								});
+
+						// Add event listener to toggle class on paper toast when screen gets small enough
+						template.$.screensize.addEventListener("query-matches-changed", function()
+								{
+									Polymer.Base.toggleClass("fit-bottom", template.$.screensize.queryMatches, template.$.toast);
+								});
+
+						// Initially set the class on the paper toast
+						Polymer.Base.toggleClass("fit-bottom", template.$.screensize.queryMatches, template.$.toast);
+
+						// Define website pages
+						page("/", mainPage);
+						page("/about", descriptorPage);
+						page({hashbang: true});
+
+						function mainPage(ctx)
+						{
+							template.selected = "tagline-page";
+						}
+
+						function descriptorPage(ctx)
+						{
+							template.selected = "description-page";
+						}
+					}
+				});
+		 })();
+	</script>
 </html>
